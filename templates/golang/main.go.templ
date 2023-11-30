@@ -1,0 +1,17 @@
+package main
+
+import (
+	"fmt"
+	"os"
+
+	// lib "github.com/vdinovi/advent_of_code_2023/lib/golang"
+	soln "github.com/vdinovi/advent_of_code_2023/{{day .}}/solution"
+)
+
+func main() {
+	err := soln.Solve()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s\n", err)
+		os.Exit(1)
+	}
+}
