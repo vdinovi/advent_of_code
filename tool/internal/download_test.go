@@ -64,7 +64,6 @@ func TestDownloadWithSessionToken(t *testing.T) {
 	var target *html.Node
 	var search func(n *html.Node)
 	search = func(n *html.Node) {
-		t.Log(n.Data)
 		if answerPrompt.Match([]byte(n.Data)) || completedPrompt.Match([]byte(n.Data)) {
 			target = n
 			return
