@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 	"time"
 
@@ -85,6 +86,7 @@ func render(
 		src := filepath.Join(templates, path)
 		switch filepath.Ext(path) {
 		case templateExt:
+			dest = strings.TrimSuffix(dest, templateExt)
 			return render_template(ch, src, dest)
 		default:
 			return copy_file(ch, src, dest)
@@ -103,6 +105,7 @@ type data struct {
 
 func render_template(ch *challenge, source, dest string) (err error) {
 	fmt.Printf("-> render %s %s\n", source, dest)
+
 	templ := template.New(source)
 	buf, err := os.ReadFile(source)
 	if err != nil {
