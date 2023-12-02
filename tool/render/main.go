@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/vdinovi/advent_of_code_2023/tool/internal"
@@ -22,6 +21,7 @@ func main() {
 	day := flag.Int("day", 0, "specify the day of month")
 	templates := flag.String("templates", "", "specify path to templates directory")
 	output := flag.String("output", "", "specify path to output directory")
+	rm := flag.Bool("rm", false, "remove existing files")
 	flag.Parse()
 
 	if language, err = parseLanguage("language", *lang); err != nil {
@@ -44,8 +44,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	challengeDir := filepath.Join(outputDir, fmt.Sprint(date.Day()))
-	err = render(language, date, challengeDir, templatesDir)
+	err = render(language, date, outputDir, templatesDir, *rm)
 	if err != nil {
 		fmt.Fprintf(os.Stdout, "error: %s\n", err)
 		os.Exit(1)
