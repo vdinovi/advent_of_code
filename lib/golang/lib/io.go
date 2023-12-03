@@ -1,6 +1,8 @@
 package lib
 
-import "io"
+import (
+	"io"
+)
 
 func ReadAllAsBytes(r io.Reader) (buf []byte, err error) {
 	return io.ReadAll(r)
