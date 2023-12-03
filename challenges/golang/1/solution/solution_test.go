@@ -1,10 +1,15 @@
 package solution_test
 
 import (
+	_ "embed"
+	"strings"
 	"testing"
 
 	soln "github.com/vdinovi/advent_of_code_2023/challenges/golang/1/solution"
 )
+
+//go:embed solution_test/1.txt
+var one_txt string
 
 func TestSolution(t *testing.T) {
 	tests := []struct {
@@ -14,11 +19,16 @@ func TestSolution(t *testing.T) {
 	}{
 		{
 			id: "Sample 1",
-			input: `1abc2
+			input: strings.NewReader(`1abc2
 			pqr3stu8vwx
 			a1b2c3d4e5f
-			treb7uchet`,
+			treb7uchet`),
 			expected: 142,
+		},
+		{
+			id:       "Sample 1",
+			input:    strings.NewReader(one_txt),
+			expected: 52974,
 		},
 	}
 
