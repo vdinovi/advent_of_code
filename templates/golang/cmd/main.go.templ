@@ -5,21 +5,20 @@ import (
 	"os"
 
 	soln "github.com/vdinovi/advent_of_code_2023/challenges/golang/{{.Day}}/solution"
-	"github.com/vdinovi/advent_of_code_2023/lib/golang/lib"
 )
 
 func main() {
-	str, err := lib.ReadAllAsString(os.Stdin)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %s\n", err)
-		os.Exit(1)
-	}
-	input := soln.Input(str)
-	answer, err := soln.Solve(input)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %s\n", err)
-		os.Exit(1)
-	}
+	// answer, err := soln.SolveP1(os.Stdin)
+	// if err != nil {
+	// 	fmt.Fprintf(os.Stderr, "error: %s\n", err)
+	// 	os.Exit(1)
+	// }
+	// fmt.Printf("Answer 1 = %d\n", answer)
 
-	fmt.Println(answer)
+	// answer, err := soln.SolveP2(os.Stdin)
+	// if err != nil {
+	//	fmt.Fprintf(os.Stderr, "error: %s\n", err)
+	//	os.Exit(1)
+	// }
+	// fmt.Printf("Answer 2 = %d\n", answer)
 }
