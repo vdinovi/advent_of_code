@@ -23,5 +23,17 @@ func SolveP1(input Input) (Answer, error) {
 }
 
 func SolveP2(input Input) (Answer, error) {
-	return 0, nil
+	records, err := Parse(input)
+	if err != nil {
+		return 0, err
+	}
+	sum := 0
+	for _, record := range records {
+		product := 1
+		for _, cube := range record.Fewest() {
+			product *= cube
+		}
+		sum += product
+	}
+	return Answer(sum), nil
 }

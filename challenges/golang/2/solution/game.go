@@ -28,6 +28,15 @@ func (r *Record) Possible(cubes [3]int) bool {
 	return true
 }
 
+func (r *Record) Fewest() (cubes [3]int) {
+	for _, note := range r.Notes {
+		for i, n := range note {
+			cubes[i] = max(cubes[i], n)
+		}
+	}
+	return cubes
+}
+
 type Record struct {
 	Game  int
 	Notes [][3]int
