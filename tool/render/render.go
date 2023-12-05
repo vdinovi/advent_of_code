@@ -47,7 +47,7 @@ func render(
 	} else if !info.IsDir() {
 		return fmt.Errorf("%s is not a directory", templates)
 	}
-	target := filepath.Join(outputDir, ch.lang.TemplateName, fmt.Sprint(date.Day()))
+	target := filepath.Join(outputDir, fmt.Sprint(date.Year()), ch.lang.TemplateName, fmt.Sprint(date.Day()))
 	if remove {
 		fmt.Printf("-> rm -r %s\n", target)
 		if err := os.RemoveAll(target); err != nil {
