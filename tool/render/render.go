@@ -100,6 +100,7 @@ func render(
 
 type data struct {
 	Day     int
+	Year    int
 	LibName string
 }
 
@@ -124,6 +125,7 @@ func render_template(ch *challenge, source, dest string) (err error) {
 
 	return templ.Execute(fdest, data{
 		Day:     ch.date.Day(),
+		Year:    ch.date.Year(),
 		LibName: ch.lang.LibName,
 	})
 }
