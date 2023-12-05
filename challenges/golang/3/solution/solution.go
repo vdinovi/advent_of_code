@@ -20,16 +20,37 @@ func SolveP1(input Input) (Answer, error) {
 	sm := symbolMap(symbols, width, height)
 	sum := 0
 	for _, p := range parts {
-		if isAdjacent(p, sm, width, height) {
+		if _, ok := isAdjacent(p, sm, width, height); ok {
 			sum += p.number
-			// fmt.Printf("%d (%d,%d:%d) adj to %c at (%d,%d)\n", p.number, p.pos.row, p.pos.start, p.pos.end, s.rune, s.pos.row, s.pos.start)
 		}
 	}
 	return Answer(sum), nil
 }
 
 func SolveP2(input Input) (Answer, error) {
-	return 0, nil
+	parts, symbols, width, height, err := parse(input)
+	if err != nil {
+		return 0, err
+	}
+	sm := symbolMap(symbols, width, height)
+	for _, p := range parts {
+		if s, ok := isAdjacent(p, sm, width, height); ok {
+			if s.adjacencies == nil {
+				s.adjacencies = []int{p.number}
+			} else {
+				s.adjacencies = append(s.adjacencies, p.number)
+			}
+		}
+	}
+	sum := 0
+	for _, row := range sm {
+		for _, s := range row {
+			if s != nil && len(s.adjacencies) == 2 {
+				sum += s.adjacencies[0] * s.adjacencies[1]
+			}
+		}
+	}
+	return Answer(sum), nil
 }
 
 type position struct {
@@ -45,18 +66,19 @@ type part struct {
 
 type symbol struct {
 	rune
-	pos position
+	pos         position
+	adjacencies []int
 }
 
-func isAdjacent(part part, sm [][]*symbol, width, height int) bool {
+func isAdjacent(part part, sm [][]*symbol, width, height int) (*symbol, bool) {
 	for i := max(part.pos.row-1, 0); i <= min(part.pos.row+1, height-1); i += 1 {
 		for j := max(part.pos.start-1, 0); j <= min(part.pos.end, width-1); j += 1 {
 			if sm[i][j] != nil {
-				return true
+				return sm[i][j], true
 			}
 		}
 	}
-	return false
+	return nil, false
 }
 
 func parse(input Input) ([]part, []symbol, int, int, error) {
