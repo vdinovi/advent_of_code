@@ -23,9 +23,9 @@ func optimal(T float64) float64 {
 	return 0.5 * T
 }
 
-// solve set R = dist(t, T) and solve for t
-func roots(R, T float64) (float64, float64) {
-	discr := math.Sqrt(math.Pow(-T, 2) - 4*R)
+// solve set D = dist(t, T) and solve for t
+func roots(D, T float64) (float64, float64) {
+	discr := math.Sqrt(math.Pow(-T, 2) - 4*D)
 	r1 := (T - discr) / 2
 	r2 := (T + discr) / 2
 	return min(r1, r2), max(r1, r2)
@@ -34,8 +34,8 @@ func roots(R, T float64) (float64, float64) {
 func SolveP1(input Input) (Answer, error) {
 	product := 1
 	for i, T := range input.Times {
-		R := input.Distances[i]
-		r1, r2 := roots(float64(R), float64(T))
+		D := input.Distances[i]
+		r1, r2 := roots(float64(D), float64(T))
 		times := int(math.Floor(r2-0.01)) - int(math.Ceil(r1+0.01)) + 1
 		product *= times
 	}
@@ -43,5 +43,9 @@ func SolveP1(input Input) (Answer, error) {
 }
 
 func SolveP2(input Input) (Answer, error) {
-	return 0, nil
+	T := input.Times[0]
+	D := input.Distances[0]
+	r1, r2 := roots(float64(D), float64(T))
+	times := int(math.Floor(r2-0.01)) - int(math.Ceil(r1+0.01)) + 1
+	return Answer(times), nil
 }

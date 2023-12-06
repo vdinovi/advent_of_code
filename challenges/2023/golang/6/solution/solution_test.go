@@ -55,16 +55,16 @@ func TestSolutionP2(t *testing.T) {
 		{
 			id: "Sample 1",
 			input: soln.Input{
-				Times:     []int{7, 15, 30},
-				Distances: []int{9, 40, 200},
+				Times:     []int{71530},
+				Distances: []int{940200},
 			},
 			expected: 0,
 		},
 		{
 			id: "Puzzle 1",
 			input: soln.Input{
-				Times:     []int{42, 89, 91, 89},
-				Distances: []int{308, 1170, 1291, 1467},
+				Times:     []int{42899189},
+				Distances: []int{308117012911467},
 			},
 			expected: 0,
 		},
