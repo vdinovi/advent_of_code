@@ -20,7 +20,7 @@ func SolveP1(input Input) (Answer, error) {
 	}
 	lowest := math.MaxInt64
 	for _, seed := range seeds.elems {
-		loc, err := traverse(seed, "seed", "location", mappings)
+		loc, err := traverseValue(seed, "seed", "location", mappings)
 		if err != nil {
 			return 0, err
 		}
@@ -38,61 +38,43 @@ func SolveP2(input Input) (Answer, error) {
 	if !ok {
 		return 0, fmt.Errorf("sequence 'seeds' not found")
 	}
-	mappings = invert(mappings)
-	minLoc := 0
-	// TODO: implement a non-brute force
-	maxLoc := 10834441
-	log := int(maxLoc / 100)
-	lowest := math.MaxInt64
-	for loc := minLoc; loc < maxLoc; loc += 1 {
-		if loc%log == 0 {
-			fmt.Printf("> %d%%\n", loc/log)
-		}
-		seed, err := traverse(loc, "location", "seed", mappings)
-		// fmt.Printf("location(%d) -> seed(%d)\n", loc, seed)
-		if err != nil {
-			return 0, err
-		}
-		for i := 0; i < len(seeds.elems); i += 2 {
-			if seed >= seeds.elems[i] && seed < seeds.elems[i]+seeds.elems[i+1] {
-				// fmt.Printf("lowest = min(%d, %d)\n", lowest, loc)
-				lowest = min(lowest, loc)
-			}
-		}
+	ranges := make([][2]int, len(seeds.elems)/2)
+	for i := 0; i < len(seeds.elems); i += 2 {
+		ranges[i/2][0] = seeds.elems[i]
+		ranges[i/2][1] = seeds.elems[i] + seeds.elems[i+1]
+	}
+	result, err := traverseRanges(ranges, "seed", "location", mappings)
+	if err != nil {
+		return 0, err
+	}
+	lowest := math.MaxInt
+	for _, r := range result {
+		lowest = min(lowest, r[0])
 	}
 	return Answer(lowest), nil
 }
 
-func traverse(value int, source, destination string, mappings map[string]*mapping) (int, error) {
+func traverseValue(value int, source, destination string, mappings map[string]*mapping) (int, error) {
 	for source != destination {
 		m, ok := mappings[source]
 		if !ok {
 			return 0, fmt.Errorf("map not found for source %q", source)
 		}
-		//fmt.Printf("%s(%d) -> %s(%d)\n", source, value, m.destination, m.get(value))
 		source, value = m.destination, m.get(value)
 	}
 	return value, nil
 }
 
-func invert(mappings map[string]*mapping) map[string]*mapping {
-	inverted := make(map[string]*mapping, len(mappings))
-	for _, m := range mappings {
-		inv := &mapping{
-			source:      m.destination,
-			destination: m.source,
-			trans:       make([][3]int, len(m.trans)),
+func traverseRanges(ranges [][2]int, source, destination string, mappings map[string]*mapping) ([][2]int, error) {
+	for source != destination {
+		m, ok := mappings[source]
+		if !ok {
+			return nil, fmt.Errorf("map not found for source %q", source)
 		}
-		for i := range m.trans {
-			inv.trans[i] = [3]int{
-				m.trans[i][1],
-				m.trans[i][0],
-				m.trans[i][2],
-			}
-		}
-		inverted[m.destination] = inv
+		ranges = m.getRanges(ranges)
+		source = m.destination
 	}
-	return inverted
+	return ranges, nil
 }
 
 func scan(input Input) (map[string]*sequence, map[string]*mapping, error) {
@@ -130,4 +112,48 @@ func (m *mapping) get(value int) int {
 		}
 	}
 	return value
+}
+
+func (m *mapping) getRanges(rs [][2]int) [][2]int {
+	ranges := make(rangeSet)
+	ranges.add(rs...)
+	mapped := make(rangeSet)
+	for _, t := range m.trans {
+		filter := make(rangeSet)
+		for r := range ranges {
+			if s, e := r[0], min(r[1], t[1]); s < e {
+				// left portion not empty, preserve
+				filter.add([2]int{s, e})
+			}
+			if s, e := max(r[0], t[1]), min(t[1]+t[2], r[1]); s < e {
+				// overlapping portion not empty, add mapped range
+				mapped.add([2]int{s - t[1] + t[0], e - t[1] + t[0]})
+			}
+			if s, e := max(t[1]+t[2], r[0]), r[1]; s < e {
+				// right portion not empty, preserve
+				filter.add([2]int{s, e})
+			}
+		}
+		ranges = filter
+	}
+	ranges.add(mapped.asSlice()...)
+	return ranges.asSlice()
+}
+
+type rangeSet map[[2]int]bool
+
+func (rs rangeSet) add(ranges ...[2]int) {
+	for _, r := range ranges {
+		rs[r] = true
+	}
+}
+
+func (rs rangeSet) asSlice() [][2]int {
+	s := make([][2]int, len(rs))
+	i := 0
+	for r := range rs {
+		s[i] = r
+		i += 1
+	}
+	return s
 }
