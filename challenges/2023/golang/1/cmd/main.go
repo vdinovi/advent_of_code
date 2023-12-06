@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	soln "github.com/vdinovi/advent_of_code_2023/challenges/golang/1/solution"
+	soln "github.com/vdinovi/advent_of_code/challenges/2023/golang/1/solution"
 )
 
 func main() {

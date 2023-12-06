@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	soln "github.com/vdinovi/advent_of_code_2023/challenges/golang/2/solution"
+	soln "github.com/vdinovi/advent_of_code/challenges/2023/golang/2/solution"
 )
 
 //go:embed solution_test/1.txt

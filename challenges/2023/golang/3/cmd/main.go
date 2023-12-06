@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	soln "github.com/vdinovi/advent_of_code_2023/challenges/golang/3/solution"
+	soln "github.com/vdinovi/advent_of_code/challenges/2023/golang/3/solution"
 )
 
 func main() {

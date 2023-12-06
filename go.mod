@@ -1,4 +1,4 @@
-module github.com/vdinovi/advent_of_code_2023
+module github.com/vdinovi/advent_of_code
 
 go 1.21.4
 

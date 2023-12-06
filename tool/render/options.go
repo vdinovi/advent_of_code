@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/vdinovi/advent_of_code_2023/tool/internal"
+	"github.com/vdinovi/advent_of_code/tool/internal"
 )
 
 type invalidArgumentError struct {
