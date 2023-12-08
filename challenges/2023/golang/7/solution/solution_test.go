@@ -58,12 +58,12 @@ func TestSolutionP2(t *testing.T) {
 			KK677 28
 			KTJJT 220
 			QQQJA 483`),
-			expected: 0,
+			expected: 5905,
 		},
 		{
 			id:       "Puzzle 1",
 			input:    strings.NewReader(one_txt),
-			expected: 0,
+			expected: 251224870,
 		},
 	}
 

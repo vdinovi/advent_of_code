@@ -2,18 +2,41 @@ package solution
 
 import (
 	"fmt"
-	"slices"
 	"unicode"
 )
 
+type deck struct {
+	cards []card
+	index map[card]int
+	runes map[rune]card
+}
+
+func newDeck(cards ...card) *deck {
+	deck := &deck{
+		cards: make([]card, len(cards)),
+		index: make(map[card]int, len(cards)),
+		runes: make(map[rune]card),
+	}
+	for i, c := range cards {
+		deck.cards[i] = c
+		deck.runes[rune(c)] = c
+		deck.index[c] = i
+	}
+	return deck
+}
+
 type card rune
 
-func newCard(r rune) (card, error) {
+func (d *deck) newCard(r rune) (card, error) {
 	r = unicode.ToUpper(r)
-	if c, ok := runes[r]; ok {
+	if c, ok := d.runes[r]; ok {
 		return c, nil
 	}
 	return 0, &InvalidCardError{Card: r}
+}
+
+func (d *deck) rank(c card) (rank int) {
+	return d.index[c]
 }
 
 func (c card) String() string {
@@ -25,43 +48,19 @@ type hand struct {
 	bid   int
 }
 
-func newHand(cards []rune, bid int) (h hand, err error) {
+func (d *deck) newHand(cards []rune, bid int) (h hand, err error) {
 	if len(cards) != len(h.cards) {
 		return h, &InvalidHandError{Cards: cards}
 	}
 	h.bid = bid
 	for i, r := range cards[:len(h.cards)] {
-		h.cards[i], err = newCard(r)
+		h.cards[i], err = d.newCard(r)
 		if err != nil {
 			return h, err
 
 		}
 	}
 	return h, nil
-}
-
-func (h hand) score() (handType int, ranks [5]int) {
-	counts := [len(cards)][2]int{}
-	for _, c := range h.cards {
-		i := index[c]
-		counts[i][0] += 1
-		counts[i][1] = i + 1
-	}
-	slices.SortFunc(counts[:], func(i, j [2]int) int {
-		if d := j[0] - i[0]; d != 0 {
-			return d
-		}
-		if d := j[1] - i[1]; d != 0 {
-			return d
-		}
-		return 0
-	})
-	c1, c2 := counts[0][0], counts[1][0]
-	handType = handTypeFor(c1, c2)
-	for i := range ranks {
-		ranks[i] = counts[i][1]
-	}
-	return handType, ranks
 }
 
 func handTypeFor(c1, c2 int) int {
@@ -89,30 +88,29 @@ func handTypeFor(c1, c2 int) int {
 	}
 }
 
-func handSortFunc(i, j hand) int {
-	iht, _ := i.score()
-	jht, _ := j.score()
-	if d := iht - jht; d != 0 {
-		return d
-	}
-	for k := range i.cards {
-		if d := index[i.cards[k]] - index[j.cards[k]]; d != 0 {
+type scoreFunc func(h hand) (handType int, ranks [5]int)
+type rankFunc func(c card) (rank int)
+
+func handSortFunc(score scoreFunc, rank rankFunc) func(i, j hand) int {
+	return func(i, j hand) int {
+		iht, _ := score(i)
+		jht, _ := score(j)
+		if d := iht - jht; d != 0 {
 			return d
 		}
+		for k := range i.cards {
+			if d := rank(i.cards[k]) - rank(j.cards[k]); d != 0 {
+				return d
+			}
+		}
+		return 0
 	}
-	return 0
 }
 
-func (h hand) String() string {
-	ht, ranks := h.score()
-	return fmt.Sprintf("%s %d (%d %v)", string(h.cards[:]), h.bid, ht, ranks)
+func (h hand) String(score scoreFunc) string {
+	ht, ranks := score(h)
+	return fmt.Sprintf("%s %d (%s %v)", string(h.cards[:]), h.bid, handTypeString(ht), ranks)
 }
-
-var cards = [...]card{
-	'1', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A',
-}
-var index map[card]int
-var runes map[rune]card
 
 const (
 	highCard int = iota
@@ -124,13 +122,24 @@ const (
 	fiveOfAKind
 )
 
-func init() {
-	index = make(map[card]int, len(cards))
-	runes = make(map[rune]card)
-	for i, c := range cards {
-		cards[i] = c
-		runes[rune(c)] = c
-		index[c] = i
+func handTypeString(ht int) string {
+	switch ht {
+	case highCard:
+		return "HighCard"
+	case onePair:
+		return "OnePair"
+	case twoPair:
+		return "TwoPair"
+	case threeOfAKind:
+		return "ThreeOfAKind"
+	case fullHouse:
+		return "FullHouse"
+	case fourOfAKind:
+		return "FourOfAKind"
+	case fiveOfAKind:
+		return "FiveOfAKind"
+	default:
+		return "Unknown"
 	}
 }
 
