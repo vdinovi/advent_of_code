@@ -65,14 +65,23 @@ func TestSolutionP2(t *testing.T) {
 		expected soln.Answer
 	}{
 		{
-			id:       "Sample 1",
-			input:    strings.NewReader(""),
-			expected: 0,
+			id: "Sample 1",
+			input: strings.NewReader(`LR
+
+			11A = (11B, XXX)
+			11B = (XXX, 11Z)
+			11Z = (11B, XXX)
+			22A = (22B, XXX)
+			22B = (22C, 22C)
+			22C = (22Z, 22Z)
+			22Z = (22B, 22B)
+			XXX = (XXX, XXX)`),
+			expected: 6,
 		},
 		{
 			id:       "Puzzle 1",
 			input:    strings.NewReader(one_txt),
-			expected: 0,
+			expected: 13334102464297,
 		},
 	}
 

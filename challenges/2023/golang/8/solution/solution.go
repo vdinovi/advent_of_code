@@ -16,21 +16,67 @@ func SolveP1(input Input) (Answer, error) {
 	if err != nil {
 		return 0, err
 	}
-	current := node("AAA")
-	target := node("ZZZ")
-	steps := 0
-	for i := 0; current != target; i += 1 {
+	stop := func(n node) bool {
+		for _, r := range n {
+			if r != 'Z' {
+				return false
+			}
+		}
+		return true
+	}
+	steps := traverse(node("AAA"), stop, dirs, chart)
+	return Answer(steps), nil
+}
+
+func SolveP2(input Input) (Answer, error) {
+	chart, dirs, err := scan(input)
+	if err != nil {
+		return 0, err
+	}
+	starts := []node{}
+	for n := range chart {
+		if n[len(n)-1] == 'A' {
+			starts = append(starts, n)
+		}
+	}
+	stop := func(n node) bool {
+		return n[len(n)-1] == 'Z'
+	}
+	periods := make([]int, len(starts))
+	for i, cur := range starts {
+		periods[i] = traverse(cur, stop, dirs, chart)
+	}
+	return Answer(lcm(periods...)), nil
+
+}
+
+type stopFunc = func(node) bool
+
+func traverse(start node, stop stopFunc, dirs []direction, chart map[node][2]node) (steps int) {
+	current := start
+	for i := 0; !stop(current); i += 1 {
 		if i >= len(dirs) {
 			i = 0
 		}
 		current = chart[current][dirs[i]]
 		steps += 1
 	}
-	return Answer(steps), nil
+	return steps
 }
 
-func SolveP2(input Input) (Answer, error) {
-	return 0, nil
+func lcm(n ...int) int {
+	result := n[0]
+	for _, n := range n[1:] {
+		result = n * result / gcd(n, result)
+	}
+	return result
+}
+
+func gcd(a, b int) int {
+	if a == 0 {
+		return b
+	}
+	return gcd(b%a, a)
 }
 
 type node string
@@ -53,7 +99,7 @@ func (d direction) String() string {
 	}
 }
 
-var re = regexp.MustCompile(`^([A-Z]{3})\s*=\s*\(([A-Z]{3}),\s*([A-Z]{3})\)$`)
+var re = regexp.MustCompile(`^([A-Z\d]{3})\s*=\s*\(([A-Z\d]{3}),\s*([A-Z\d]{3})\)$`)
 
 func scan(input Input) (chart map[node][2]node, dirs []direction, err error) {
 	chart = make(map[node][2]node)
