@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	soln "github.com/vdinovi/advent_of_code/challenges/{{.Year}}/golang/{{.Day}}/solution"
+	soln "github.com/vdinovi/advent_of_code/challenges/2023/golang/9/solution"
 )
 
 //go:embed solution_test/1.txt
@@ -19,13 +19,15 @@ func TestSolutionP1(t *testing.T) {
 	}{
 		{
 			id: "Sample 1",
-			input: strings.NewReader(``),
-			expected: -1,
+			input: strings.NewReader(`0 3 6 9 12 15
+			1 3 6 10 15 21
+			10 13 16 21 30 45`),
+			expected: 114,
 		},
 		{
 			id:       "Puzzle 1",
 			input:    strings.NewReader(one_txt),
-			expected: -1,
+			expected: 1974913025,
 		},
 	}
 
@@ -49,7 +51,9 @@ func TestSolutionP2(t *testing.T) {
 	}{
 		{
 			id: "Sample 1",
-			input: strings.NewReader(``),
+			input: strings.NewReader(`0 3 6 9 12 15
+			1 3 6 10 15 21
+			10 13 16 21 30 45`),
 			expected: -1,
 		},
 		{
