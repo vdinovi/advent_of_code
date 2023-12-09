@@ -35,7 +35,9 @@ func (t *Trie[T, K]) Add(key []K, val *T) {
 		iter = iter.addChild(k, nil)
 	}
 	last := key[len(key)-1]
-	if _, ok := iter.children[last]; !ok {
+	if child, ok := iter.children[last]; ok {
+		child.val = val
+	} else {
 		iter.addChild(last, val)
 	}
 }
