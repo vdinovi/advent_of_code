@@ -16,24 +16,46 @@ func SolveP1(input Input) (Answer, error) {
 	}
 	sum := 0
 	for _, ns := range histories {
-		sum += predict(ns)
+		sum += predict(ns, forward)
 	}
 	return Answer(sum), nil
 }
 
 func SolveP2(input Input) (Answer, error) {
-	return 0, nil
+	histories, err := scan(input)
+	if err != nil {
+		return 0, err
+	}
+	sum := 0
+	for _, ns := range histories {
+		sum += predict(ns, backward)
+	}
+	return Answer(sum), nil
 }
 
-func predict(ns []int) int {
-	if lib.AllEqual(ns) {
-		return ns[len(ns)-1]
+type direction int
+
+const (
+	forward direction = iota
+	backward
+)
+
+func predict(ns []int, dir direction) (prediction int) {
+	if !lib.AllEqual(ns) {
+		deltas := make([]int, len(ns)-1)
+		for i := 1; i < len(ns); i++ {
+			deltas[i-1] = ns[i] - ns[i-1]
+		}
+		prediction = predict(deltas, dir)
 	}
-	deltas := make([]int, len(ns)-1)
-	for i := 1; i < len(ns); i++ {
-		deltas[i-1] = ns[i] - ns[i-1]
+	switch dir {
+	case forward:
+		return ns[len(ns)-1] + prediction
+	case backward:
+		return ns[0] - prediction
+	default:
+		panic("invalid direction")
 	}
-	return ns[len(ns)-1] + predict(deltas)
 }
 
 func scan(r io.Reader) (histories [][]int, err error) {

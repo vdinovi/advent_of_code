@@ -54,12 +54,12 @@ func TestSolutionP2(t *testing.T) {
 			input: strings.NewReader(`0 3 6 9 12 15
 			1 3 6 10 15 21
 			10 13 16 21 30 45`),
-			expected: -1,
+			expected: 2,
 		},
 		{
 			id:       "Puzzle 1",
 			input:    strings.NewReader(one_txt),
-			expected: -1,
+			expected: 884,
 		},
 	}
 
