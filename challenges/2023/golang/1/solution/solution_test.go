@@ -8,8 +8,8 @@ import (
 	soln "github.com/vdinovi/advent_of_code/challenges/2023/golang/1/solution"
 )
 
-//go:embed solution_test/1.txt
-var one_txt string
+//go:embed solution_test/input.txt
+var input_txt string
 
 func TestSolutionP1(t *testing.T) {
 	tests := []struct {
@@ -27,7 +27,7 @@ func TestSolutionP1(t *testing.T) {
 		},
 		{
 			id:       "Puzzle 1",
-			input:    strings.NewReader(one_txt),
+			input:    strings.NewReader(input_txt),
 			expected: 52974,
 		},
 	}
@@ -63,7 +63,7 @@ func TestSolutionP2(t *testing.T) {
 		},
 		{
 			id:       "Puzzle 1",
-			input:    strings.NewReader(one_txt),
+			input:    strings.NewReader(input_txt),
 			expected: 53340,
 		},
 	}
