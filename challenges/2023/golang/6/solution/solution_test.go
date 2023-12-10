@@ -22,7 +22,7 @@ func TestSolutionP1(t *testing.T) {
 				Times:     []int{7, 15, 30},
 				Distances: []int{9, 40, 200},
 			},
-			expected: 0,
+			expected: 288,
 		},
 		{
 			id: "Puzzle 1",
@@ -30,7 +30,7 @@ func TestSolutionP1(t *testing.T) {
 				Times:     []int{42, 89, 91, 89},
 				Distances: []int{308, 1170, 1291, 1467},
 			},
-			expected: 0,
+			expected: 3317888,
 		},
 	}
 
@@ -58,7 +58,7 @@ func TestSolutionP2(t *testing.T) {
 				Times:     []int{71530},
 				Distances: []int{940200},
 			},
-			expected: 0,
+			expected: 71503,
 		},
 		{
 			id: "Puzzle 1",
@@ -66,7 +66,7 @@ func TestSolutionP2(t *testing.T) {
 				Times:     []int{42899189},
 				Distances: []int{308117012911467},
 			},
-			expected: 0,
+			expected: 24655068,
 		},
 	}
 
