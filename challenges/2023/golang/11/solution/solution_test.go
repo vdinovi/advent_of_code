@@ -68,13 +68,13 @@ func TestSolutionP2(t *testing.T) {
 			..........
 			.......#..
 			#...#.....`),
-			expected: -1,
+			expected: 82000210,
 		},
-		// {
-		// 	id:       "Puzzle 1",
-		// 	input:    strings.NewReader(input_txt),
-		// 	expected: -1,
-		// },
+		{
+			id:       "Puzzle 1",
+			input:    strings.NewReader(input_txt),
+			expected: 513171773355,
+		},
 	}
 
 	for _, test := range tests {

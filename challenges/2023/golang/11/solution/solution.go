@@ -18,8 +18,10 @@ func SolveP1(input Input) (Answer, error) {
 	if err != nil {
 		return 0, err
 	}
-	scaleEmptyGalaxies(grid)
-	distances, err := calculateMinimumDistances(grid)
+	if err := scaleEmptySectors(grid, 2); err != nil {
+		return 0, err
+	}
+	distances, err := minimumDistances(grid)
 	if err != nil {
 		return 0, err
 	}
@@ -31,12 +33,28 @@ func SolveP1(input Input) (Answer, error) {
 }
 
 func SolveP2(input Input) (Answer, error) {
-	return 0, nil
+	grid, err := scan(input)
+	if err != nil {
+		return 0, err
+	}
+	if err := scaleEmptySectors(grid, 1000000); err != nil {
+		return 0, err
+	}
+	distances, err := minimumDistances(grid)
+	if err != nil {
+		return 0, err
+	}
+	sum := 0
+	for _, dist := range distances {
+		sum += dist
+	}
+	return Answer(sum), nil
 }
 
 type sector struct {
 	label rune
 	id    int
+	dist  int
 }
 
 func (s sector) String() string {
@@ -46,53 +64,104 @@ func (s sector) String() string {
 	return string(s.label)
 }
 
-func calculateMinimumDistances(g *lib.Grid[sector]) (map[[2]int]int, error) {
-	distances, err := g.Distances(func(entry *lib.GridEntry[sector]) bool {
-		return entry.Present
-	})
-	if err != nil {
-		return nil, err
-	}
-	shortest := map[[2]int]int{}
-	for from, edges := range distances {
-		for _, edge := range edges {
-			pair := [2]int{
-				min(from.Item.id, edge.Entry.Item.id),
-				max(from.Item.id, edge.Entry.Item.id),
+func minimumDistances(g *lib.Grid[sector]) (map[[2]int]int, error) {
+	distances := map[[2]int]int{}
+	var (
+		iter1 *lib.GridIterator[sector]
+		iter2 *lib.GridIterator[sector]
+	)
+	for iter1 = g.Iterator(); iter1.Next(); {
+		from := iter1.Entry()
+		if !from.Present {
+			continue
+		}
+		for iter2 = g.Iterator(); iter2.Next(); {
+			to := iter2.Entry()
+			if !to.Present || from == to {
+				continue
 			}
-			if _, ok := shortest[pair]; !ok {
-				shortest[pair] = math.MaxInt
+			index := [2]int{
+				min(from.Item.id, to.Item.id),
+				max(from.Item.id, to.Item.id),
 			}
-			shortest[pair] = min(shortest[pair], edge.Weight)
+			dist, err := distance(g, from, to)
+			if err != nil {
+				return nil, err
+			}
+			if _, ok := distances[index]; !ok {
+				distances[index] = math.MaxInt
+			}
+			distances[index] = min(distances[index], dist)
+		}
+		if err := iter2.Err(); err != nil {
+			return nil, err
 		}
 	}
-	return shortest, nil
+	return distances, iter1.Err()
 }
 
-func scaleEmptyGalaxies(g *lib.Grid[sector]) {
+func distance(g *lib.Grid[sector], from, to *lib.GridEntry[sector]) (dist int, err error) {
+	if to.Position.Row >= from.Position.Row {
+		for r := from.Position.Row + 1; r <= to.Position.Row; r += 1 {
+			entry, err := g.At(lib.Position{Row: r, Col: from.Position.Col})
+			if err != nil {
+				return 0, err
+			}
+			dist += entry.Item.dist
+		}
+	} else {
+		for r := from.Position.Row - 1; r >= to.Position.Row; r -= 1 {
+			entry, err := g.At(lib.Position{Row: r, Col: from.Position.Col})
+			if err != nil {
+				return 0, err
+			}
+			dist += entry.Item.dist
+		}
+	}
+	if to.Position.Col >= from.Position.Col {
+		for c := from.Position.Col + 1; c <= to.Position.Col; c += 1 {
+			entry, err := g.At(lib.Position{Row: from.Position.Row, Col: c})
+			if err != nil {
+				return 0, err
+			}
+			dist += entry.Item.dist
+		}
+	} else {
+		for c := from.Position.Col - 1; c >= to.Position.Col; c -= 1 {
+			entry, err := g.At(lib.Position{Row: from.Position.Row, Col: c})
+			if err != nil {
+				return 0, err
+			}
+			dist += entry.Item.dist
+		}
+	}
+	return dist, nil
+}
+
+func scaleEmptySectors(g *lib.Grid[sector], factor int) error {
 	presentRows := make([]bool, g.Height())
 	presentCols := make([]bool, g.Width())
-	for it := g.Iterator(); it.Next(); {
+	var it *lib.GridIterator[sector]
+	for it = g.Iterator(); it.Next(); {
 		entry := it.Entry()
 		if entry.Present {
 			presentRows[entry.Row] = true
 			presentCols[entry.Col] = true
 		}
 	}
-	shift := 0
-	for r, presentRow := range presentRows {
-		if !presentRow {
-			g.InsertRow(r+shift, sector{label: '.', id: 0}, false)
-			shift += 1
+	if err := it.Err(); err != nil {
+		return err
+	}
+	for it := g.Iterator(); it.Next(); {
+		entry := it.Entry()
+		if !presentRows[entry.Row] || !presentCols[entry.Col] {
+			entry.Item.dist = factor
 		}
 	}
-	shift = 0
-	for c, presentCol := range presentCols {
-		if !presentCol {
-			g.InsertColumn(c+shift, sector{label: '.', id: 0}, false)
-			shift += 1
-		}
+	if err := it.Err(); err != nil {
+		return err
 	}
+	return nil
 }
 
 func scan(input Input) (grid *lib.Grid[sector], err error) {
@@ -105,10 +174,10 @@ func scan(input Input) (grid *lib.Grid[sector], err error) {
 		for _, r := range line {
 			switch r {
 			case '#':
-				grid.Add(sector{label: r, id: id}, true)
+				grid.Add(sector{label: r, id: id, dist: 1}, true)
 				id += 1
 			case '.':
-				grid.Add(sector{label: r, id: 0}, false)
+				grid.Add(sector{label: r, id: 0, dist: 1}, false)
 			}
 		}
 		grid.NextRow()
