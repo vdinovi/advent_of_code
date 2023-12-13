@@ -1,9 +1,9 @@
-package lib_test
+package trie_test
 
 import (
 	"testing"
 
-	"github.com/vdinovi/advent_of_code/lib/golang/lib"
+	"github.com/vdinovi/advent_of_code/lib/golang/lib/trie"
 )
 
 type integer struct {
@@ -11,7 +11,7 @@ type integer struct {
 }
 
 func TestTrie(t *testing.T) {
-	trie := lib.NewTrie[integer, rune]()
+	tr := trie.NewTrie[integer, rune]()
 	data := map[string]int{
 		"abc":  1,
 		"ab":   2,
@@ -19,14 +19,14 @@ func TestTrie(t *testing.T) {
 		"bcde": 4,
 	}
 	for k, v := range data {
-		trie.Add([]rune(k), &integer{v})
+		tr.Add([]rune(k), &integer{v})
 	}
-	entries := trie.Entries()
+	entries := tr.Entries()
 	if len(entries) != 4 {
 		t.Fatalf("expected trie to have %d entries but had %d", 4, len(entries))
 	}
 	for key, val := range data {
-		v := trie.Get([]rune(key), nil)
+		v := tr.Get([]rune(key), nil)
 		if v == nil {
 			t.Fatalf("expected trie to have value %d for key %s but did not", val, key)
 		}

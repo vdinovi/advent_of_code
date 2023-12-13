@@ -1,4 +1,4 @@
-package lib
+package trie
 
 type Trie[T any, K comparable] struct {
 	root trieNode[T, K]
