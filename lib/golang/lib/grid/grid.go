@@ -1,4 +1,4 @@
-package lib
+package grid
 
 import (
 	"fmt"
@@ -8,6 +8,10 @@ import (
 type Position struct {
 	Row int
 	Col int
+}
+
+func (p Position) String() string {
+	return fmt.Sprintf("(%d, %d)", p.Row, p.Col)
 }
 
 type GridEntry[T fmt.Stringer] struct {
@@ -94,16 +98,20 @@ func (e *InvalidPositionError) Error() string {
 	return fmt.Sprintf("invalid position (%d, %d)", e.pos.Row, e.pos.Col)
 }
 
+const defaultDelimiter = "\n"
+
 func (g *Grid[T]) String() string {
 	var sb strings.Builder
-	for _, row := range g.rows {
+	for i, row := range g.rows {
 		for _, entry := range row {
 			if _, err := sb.WriteString(entry.Item.String()); err != nil {
 				panic(err)
 			}
 		}
-		if _, err := sb.WriteRune('\n'); err != nil {
-			panic(err)
+		if i < len(g.rows)-1 {
+			if _, err := sb.WriteString(defaultDelimiter); err != nil {
+				panic(err)
+			}
 		}
 	}
 	return sb.String()
@@ -218,7 +226,3 @@ func (g *Grid[T]) Distances(include func(*GridEntry[T]) bool) (map[*GridEntry[T]
 	}
 	return dists, iter1.Err()
 }
-
-// func (g *Grid[T]) DistanceBetween(from, to *GridEntry[T]) int {
-// 	return 0
-// }

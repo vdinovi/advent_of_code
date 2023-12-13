@@ -7,21 +7,21 @@ import (
 	"math"
 	"strings"
 
-	"github.com/vdinovi/advent_of_code/lib/golang/lib"
+	"github.com/vdinovi/advent_of_code/lib/golang/lib/grid"
 )
 
 type Input io.Reader
 type Answer int
 
 func SolveP1(input Input) (Answer, error) {
-	grid, err := scan(input)
+	g, err := scan(input)
 	if err != nil {
 		return 0, err
 	}
-	if err := scaleEmptySectors(grid, 2); err != nil {
+	if err := scaleEmptySectors(g, 2); err != nil {
 		return 0, err
 	}
-	distances, err := minimumDistances(grid)
+	distances, err := minimumDistances(g)
 	if err != nil {
 		return 0, err
 	}
@@ -33,14 +33,14 @@ func SolveP1(input Input) (Answer, error) {
 }
 
 func SolveP2(input Input) (Answer, error) {
-	grid, err := scan(input)
+	g, err := scan(input)
 	if err != nil {
 		return 0, err
 	}
-	if err := scaleEmptySectors(grid, 1000000); err != nil {
+	if err := scaleEmptySectors(g, 1000000); err != nil {
 		return 0, err
 	}
-	distances, err := minimumDistances(grid)
+	distances, err := minimumDistances(g)
 	if err != nil {
 		return 0, err
 	}
@@ -64,11 +64,11 @@ func (s sector) String() string {
 	return string(s.label)
 }
 
-func minimumDistances(g *lib.Grid[sector]) (map[[2]int]int, error) {
+func minimumDistances(g *grid.Grid[sector]) (map[[2]int]int, error) {
 	distances := map[[2]int]int{}
 	var (
-		iter1 *lib.GridIterator[sector]
-		iter2 *lib.GridIterator[sector]
+		iter1 *grid.GridIterator[sector]
+		iter2 *grid.GridIterator[sector]
 	)
 	for iter1 = g.Iterator(); iter1.Next(); {
 		from := iter1.Entry()
@@ -100,10 +100,10 @@ func minimumDistances(g *lib.Grid[sector]) (map[[2]int]int, error) {
 	return distances, iter1.Err()
 }
 
-func distance(g *lib.Grid[sector], from, to *lib.GridEntry[sector]) (dist int, err error) {
+func distance(g *grid.Grid[sector], from, to *grid.GridEntry[sector]) (dist int, err error) {
 	if to.Position.Row >= from.Position.Row {
 		for r := from.Position.Row + 1; r <= to.Position.Row; r += 1 {
-			entry, err := g.At(lib.Position{Row: r, Col: from.Position.Col})
+			entry, err := g.At(grid.Position{Row: r, Col: from.Position.Col})
 			if err != nil {
 				return 0, err
 			}
@@ -111,7 +111,7 @@ func distance(g *lib.Grid[sector], from, to *lib.GridEntry[sector]) (dist int, e
 		}
 	} else {
 		for r := from.Position.Row - 1; r >= to.Position.Row; r -= 1 {
-			entry, err := g.At(lib.Position{Row: r, Col: from.Position.Col})
+			entry, err := g.At(grid.Position{Row: r, Col: from.Position.Col})
 			if err != nil {
 				return 0, err
 			}
@@ -120,7 +120,7 @@ func distance(g *lib.Grid[sector], from, to *lib.GridEntry[sector]) (dist int, e
 	}
 	if to.Position.Col >= from.Position.Col {
 		for c := from.Position.Col + 1; c <= to.Position.Col; c += 1 {
-			entry, err := g.At(lib.Position{Row: from.Position.Row, Col: c})
+			entry, err := g.At(grid.Position{Row: from.Position.Row, Col: c})
 			if err != nil {
 				return 0, err
 			}
@@ -128,7 +128,7 @@ func distance(g *lib.Grid[sector], from, to *lib.GridEntry[sector]) (dist int, e
 		}
 	} else {
 		for c := from.Position.Col - 1; c >= to.Position.Col; c -= 1 {
-			entry, err := g.At(lib.Position{Row: from.Position.Row, Col: c})
+			entry, err := g.At(grid.Position{Row: from.Position.Row, Col: c})
 			if err != nil {
 				return 0, err
 			}
@@ -138,10 +138,10 @@ func distance(g *lib.Grid[sector], from, to *lib.GridEntry[sector]) (dist int, e
 	return dist, nil
 }
 
-func scaleEmptySectors(g *lib.Grid[sector], factor int) error {
+func scaleEmptySectors(g *grid.Grid[sector], factor int) error {
 	presentRows := make([]bool, g.Height())
 	presentCols := make([]bool, g.Width())
-	var it *lib.GridIterator[sector]
+	var it *grid.GridIterator[sector]
 	for it = g.Iterator(); it.Next(); {
 		entry := it.Entry()
 		if entry.Present {
@@ -164,9 +164,9 @@ func scaleEmptySectors(g *lib.Grid[sector], factor int) error {
 	return nil
 }
 
-func scan(input Input) (grid *lib.Grid[sector], err error) {
+func scan(input Input) (g *grid.Grid[sector], err error) {
 	id := 1
-	grid = lib.NewGrid[sector]()
+	g = grid.NewGrid[sector]()
 	scanner := bufio.NewScanner(input)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -174,13 +174,13 @@ func scan(input Input) (grid *lib.Grid[sector], err error) {
 		for _, r := range line {
 			switch r {
 			case '#':
-				grid.Add(sector{label: r, id: id, dist: 1}, true)
+				g.Add(sector{label: r, id: id, dist: 1}, true)
 				id += 1
 			case '.':
-				grid.Add(sector{label: r, id: 0, dist: 1}, false)
+				g.Add(sector{label: r, id: 0, dist: 1}, false)
 			}
 		}
-		grid.NextRow()
+		g.NextRow()
 	}
-	return grid, scanner.Err()
+	return g, scanner.Err()
 }
