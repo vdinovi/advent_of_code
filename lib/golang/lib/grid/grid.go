@@ -153,6 +153,42 @@ func (g *Grid[T]) InsertColumn(before int, item T, present bool) {
 	}
 }
 
+func (g *Grid[T]) Neighbors(e *GridEntry[T]) [4]*GridEntry[T] {
+	// order is clockwise: up, right, down, left
+	neighbors := [...]*GridEntry[T]{nil, nil, nil, nil}
+	if e.Position.Row > 0 {
+		neighbors[0] = &g.rows[e.Position.Row-1][e.Position.Col]
+	}
+	if e.Position.Col < len(g.rows[e.Position.Row])-1 {
+		neighbors[1] = &g.rows[e.Position.Row][e.Position.Col+1]
+	}
+	if e.Position.Row < len(g.rows)-1 {
+		neighbors[2] = &g.rows[e.Position.Row+1][e.Position.Col]
+	}
+	if e.Position.Col > 0 {
+		neighbors[3] = &g.rows[e.Position.Row][e.Position.Col-1]
+	}
+	return neighbors
+}
+
+func (g *Grid[T]) Diagonals(e *GridEntry[T]) [4]*GridEntry[T] {
+	// order is clockwise: up-left, up-right, down-right, down-left
+	diagonals := [...]*GridEntry[T]{nil, nil, nil, nil}
+	if e.Position.Row > 0 && e.Position.Col > 0 {
+		diagonals[0] = &g.rows[e.Position.Row-1][e.Position.Col-1]
+	}
+	if e.Position.Row > 0 && e.Position.Col < len(g.rows[e.Position.Row])-1 {
+		diagonals[1] = &g.rows[e.Position.Row-1][e.Position.Col+1]
+	}
+	if e.Position.Row < len(g.rows)-1 && e.Position.Col < len(g.rows[e.Position.Row])-1 {
+		diagonals[2] = &g.rows[e.Position.Row+1][e.Position.Col+1]
+	}
+	if e.Position.Row < len(g.rows)-1 && e.Position.Col > 0 {
+		diagonals[3] = &g.rows[e.Position.Row+1][e.Position.Col-1]
+	}
+	return diagonals
+}
+
 type GridIterator[T fmt.Stringer] struct {
 	g   *Grid[T]
 	cur Position

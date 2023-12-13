@@ -116,6 +116,216 @@ func TestGridInsert(t *testing.T) {
 	}
 }
 
+func TestGridNeighbors(t *testing.T) {
+	g := ticTacToeGrid(t)
+	expected := []struct {
+		from      *grid.GridEntry[square]
+		neighbors [4]*grid.GridEntry[square]
+	}{
+		{
+			from: get(t, g, 0, 0),
+			neighbors: [4]*grid.GridEntry[square]{
+				nil,
+				get(t, g, 0, 1),
+				get(t, g, 1, 0),
+				nil,
+			},
+		},
+		{
+			from: get(t, g, 0, 1),
+			neighbors: [4]*grid.GridEntry[square]{
+				nil,
+				get(t, g, 0, 2),
+				get(t, g, 1, 1),
+				get(t, g, 0, 0),
+			},
+		},
+		{
+			from: get(t, g, 0, 2),
+			neighbors: [4]*grid.GridEntry[square]{
+				nil,
+				nil,
+				get(t, g, 1, 2),
+				get(t, g, 0, 1),
+			},
+		},
+		{
+			from: get(t, g, 1, 0),
+			neighbors: [4]*grid.GridEntry[square]{
+				get(t, g, 0, 0),
+				get(t, g, 1, 1),
+				get(t, g, 2, 0),
+				nil,
+			},
+		},
+		{
+			from: get(t, g, 1, 1),
+			neighbors: [4]*grid.GridEntry[square]{
+				get(t, g, 0, 1),
+				get(t, g, 1, 2),
+				get(t, g, 2, 1),
+				get(t, g, 1, 0),
+			},
+		},
+		{
+			from: get(t, g, 1, 2),
+			neighbors: [4]*grid.GridEntry[square]{
+				get(t, g, 0, 2),
+				nil,
+				get(t, g, 2, 2),
+				get(t, g, 1, 1),
+			},
+		},
+		{
+			from: get(t, g, 2, 0),
+			neighbors: [4]*grid.GridEntry[square]{
+				get(t, g, 1, 0),
+				get(t, g, 2, 1),
+				nil,
+				nil,
+			},
+		},
+		{
+			from: get(t, g, 2, 1),
+			neighbors: [4]*grid.GridEntry[square]{
+				get(t, g, 1, 1),
+				get(t, g, 2, 2),
+				nil,
+				get(t, g, 2, 0),
+			},
+		},
+		{
+			from: get(t, g, 2, 2),
+			neighbors: [4]*grid.GridEntry[square]{
+				get(t, g, 1, 2),
+				nil,
+				nil,
+				get(t, g, 2, 1),
+			},
+		},
+	}
+	for _, exp := range expected {
+		e := exp.from
+		for i, n := range g.Neighbors(e) {
+			if n != exp.neighbors[i] {
+				if m := exp.neighbors[i]; m == nil {
+					t.Errorf("expected neighbor[%d] of %s to be nil but got %s", i, e.Position, n.Position)
+				} else if n == nil {
+					t.Errorf("expected neighbor[%d] of %s to be %s but got nil", i, e.Position, m.Position)
+				} else {
+					t.Errorf("expected neighbor[%d] of %s to be %s but got %s",
+						i, e.Position, m.Position, n.Position)
+				}
+			}
+		}
+	}
+}
+
+func TestGridDiagonals(t *testing.T) {
+	g := ticTacToeGrid(t)
+	expected := []struct {
+		from      *grid.GridEntry[square]
+		diagonals [4]*grid.GridEntry[square]
+	}{
+		{
+			from: get(t, g, 0, 0),
+			diagonals: [4]*grid.GridEntry[square]{
+				nil,
+				nil,
+				get(t, g, 1, 1),
+				nil,
+			},
+		},
+		{
+			from: get(t, g, 0, 1),
+			diagonals: [4]*grid.GridEntry[square]{
+				nil,
+				nil,
+				get(t, g, 1, 2),
+				get(t, g, 1, 0),
+			},
+		},
+		{
+			from: get(t, g, 0, 2),
+			diagonals: [4]*grid.GridEntry[square]{
+				nil,
+				nil,
+				nil,
+				get(t, g, 1, 1),
+			},
+		},
+		{
+			from: get(t, g, 1, 0),
+			diagonals: [4]*grid.GridEntry[square]{
+				nil,
+				get(t, g, 0, 1),
+				get(t, g, 2, 1),
+				nil,
+			},
+		},
+		{
+			from: get(t, g, 1, 1),
+			diagonals: [4]*grid.GridEntry[square]{
+				get(t, g, 0, 0),
+				get(t, g, 0, 2),
+				get(t, g, 2, 2),
+				get(t, g, 2, 0),
+			},
+		},
+		{
+			from: get(t, g, 1, 2),
+			diagonals: [4]*grid.GridEntry[square]{
+				get(t, g, 0, 1),
+				nil,
+				nil,
+				get(t, g, 2, 1),
+			},
+		},
+		{
+			from: get(t, g, 2, 0),
+			diagonals: [4]*grid.GridEntry[square]{
+				nil,
+				get(t, g, 1, 1),
+				nil,
+				nil,
+			},
+		},
+		{
+			from: get(t, g, 2, 1),
+			diagonals: [4]*grid.GridEntry[square]{
+				get(t, g, 1, 0),
+				get(t, g, 1, 2),
+				nil,
+				nil,
+			},
+		},
+		{
+			from: get(t, g, 2, 2),
+			diagonals: [4]*grid.GridEntry[square]{
+				get(t, g, 1, 1),
+				nil,
+				nil,
+				nil,
+			},
+		},
+	}
+	for _, exp := range expected {
+		e := exp.from
+		for i, n := range g.Diagonals(e) {
+			if n != exp.diagonals[i] {
+				if m := exp.diagonals[i]; m == nil {
+					t.Errorf("expected diagonal[%d] of %s to be nil but got %s", i, e.Position, n.Position)
+				} else if n == nil {
+					t.Errorf("expected diagonal[%d] of %s to be %s but got nil", i, e.Position, m.Position)
+				} else {
+					t.Errorf("expected diagonal[%d] of %s to be %s but got %s",
+						i, e.Position, m.Position, n.Position)
+				}
+			}
+		}
+	}
+}
+
 func TestGridDistances(t *testing.T) {
 	g := ticTacToeGrid(t)
 	var include = func(g *grid.GridEntry[square]) bool {
@@ -254,4 +464,14 @@ func ticTacToeGrid(t *testing.T) *grid.Grid[square] {
 		t.Fatalf("expected grid to have width=%d but got %d", ticTacToeWidth, w)
 	}
 	return g
+}
+
+func get(t *testing.T, g *grid.Grid[square], row, col int) *grid.GridEntry[square] {
+	t.Helper()
+	pos := grid.Position{Row: row, Col: col}
+	entry, err := g.At(pos)
+	if err != nil {
+		t.Fatalf("expected grid to have entry at %s but did not ", pos)
+	}
+	return entry
 }
