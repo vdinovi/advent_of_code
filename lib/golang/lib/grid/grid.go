@@ -81,6 +81,19 @@ func (g *Grid[T]) At(pos Position) (*GridEntry[T], error) {
 	return &g.rows[pos.Row][pos.Col], nil
 }
 
+func (g *Grid[T]) Last() *GridEntry[T] {
+	if g.pos.Row == 0 {
+		return nil
+	}
+	if g.pos.Col == 0 {
+		if g.pos.Row < 1 {
+			return nil
+		}
+		return &g.rows[g.pos.Row-1][len(g.rows[g.pos.Row-1])-1]
+	}
+	return &g.rows[g.pos.Row][g.pos.Col-1]
+}
+
 // Like `At“ but panics on error -- used for testing purposes
 func (g *Grid[T]) Get(pos Position) *GridEntry[T] {
 	e, err := g.At(pos)
