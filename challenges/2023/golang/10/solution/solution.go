@@ -18,10 +18,6 @@ func SolveP1(input Input) (Answer, error) {
 	if err != nil {
 		return 0, err
 	}
-	distances := make([][]int, g.Height())
-	for i := range distances {
-		distances[i] = make([]int, g.Width())
-	}
 	var steps int
 	for _, move := range possibleMoves(g, start) {
 		if move == nil {
@@ -45,7 +41,48 @@ func SolveP1(input Input) (Answer, error) {
 }
 
 func SolveP2(input Input) (Answer, error) {
-	return 0, nil
+	start, g, err := scan(input)
+	if err != nil {
+		return 0, err
+	}
+	var loop *walker
+	for _, move := range possibleMoves(g, start) {
+		if move == nil {
+			continue
+		}
+		w := walker{
+			grid:    g,
+			cur:     move,
+			visited: make(map[grid.Position]bool, g.Width()*g.Height()),
+		}
+		for w.step() {
+		}
+		if loop == nil || w.steps > loop.steps {
+			loop = &w
+		}
+	}
+	total := interior(loop.vertices, len(loop.visited))
+	return Answer(total), nil
+}
+
+// https://en.wikipedia.org/wiki/Pick's_theorem
+// interior_points = area - (boundary_points /2) + 1
+func interior(vertices []grid.Position, boundaryPoints int) int {
+	return area(vertices) - int(boundaryPoints/2) + 1
+}
+
+// https://en.wikipedia.org/wiki/Shoelace_formula
+// a = 1/2 * SUM(i=0..n-1) (y_i + y_i=1) * (x_i - x_i+1)
+func area(vertices []grid.Position) (area int) {
+	for i := range vertices {
+		j := (i + 1) % len(vertices)
+		area += (vertices[i].Col) * (vertices[j].Row)
+		area -= (vertices[i].Row) * (vertices[j].Col)
+	}
+	if area < 0 {
+		area *= -1
+	}
+	return area >> 1
 }
 
 func scan(input Input) (start *grid.GridEntry[tile], g *grid.Grid[tile], err error) {
@@ -90,14 +127,19 @@ func (t tile) String() string {
 }
 
 type walker struct {
-	steps   int
-	grid    *grid.Grid[tile]
-	cur     *grid.GridEntry[tile]
-	visited map[grid.Position]bool
+	steps    int
+	grid     *grid.Grid[tile]
+	cur      *grid.GridEntry[tile]
+	visited  map[grid.Position]bool
+	vertices []grid.Position
 }
 
 func (w *walker) step() bool {
 	w.visited[w.cur.Position] = true
+	switch w.cur.Item {
+	case 'F', '7', 'J', 'L', 'S':
+		w.vertices = append(w.vertices, w.cur.Position)
+	}
 	moves := w.moves()
 	for _, m := range moves {
 		if m != nil {
