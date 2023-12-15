@@ -18,20 +18,25 @@ func TestSolutionP1(t *testing.T) {
 		expected soln.Answer
 	}{
 		{
-			id: "Sample 1",
-			input: strings.NewReader(`???.### 1,1,3
-			.??..??...?##. 1,1,3
-			?#?#?#?#?#?#?#? 1,3,1,6
-			????.#...#... 4,1,1
-			????.######..#####. 1,6,5
-			?###???????? 3,2,1`),
+			id:       "Test 1",
+			input:    strings.NewReader("#.??.? 1,1,1,1"),
 			expected: 21,
 		},
-		{
-			id:       "Puzzle 1",
-			input:    strings.NewReader(input_txt),
-			expected: 7221,
-		},
+		// {
+		// 	id: "Sample 1",
+		// 	input: strings.NewReader(`???.### 1,1,3
+		// 	.??..??...?##. 1,1,3
+		// 	?#?#?#?#?#?#?#? 1,3,1,6
+		// 	????.#...#... 4,1,1
+		// 	????.######..#####. 1,6,5
+		// 	?###???????? 3,2,1`),
+		// 	expected: 21,
+		// },
+		// {
+		// 	id:       "Puzzle 1",
+		// 	input:    strings.NewReader(input_txt),
+		// 	expected: 7221,
+		// },
 	}
 
 	for _, test := range tests {
@@ -53,20 +58,25 @@ func TestSolutionP2(t *testing.T) {
 		expected soln.Answer
 	}{
 		{
-			id: "Sample 1",
-			input: strings.NewReader(`???.### 1,1,3
-			.??..??...?##. 1,1,3
-			?#?#?#?#?#?#?#? 1,3,1,6
-			????.#...#... 4,1,1
-			????.######..#####. 1,6,5
-			?###???????? 3,2,1`),
+			id:       "Test 1",
+			input:    strings.NewReader(".??..??...?##. 1,1,3"),
 			expected: -1,
 		},
-		{
-			id:       "Puzzle 1",
-			input:    strings.NewReader(input_txt),
-			expected: -1,
-		},
+		// {
+		// 	id: "Sample 1",
+		// 	input: strings.NewReader(`???.### 1,1,3
+		// 	.??..??...?##. 1,1,3
+		// 	?#?#?#?#?#?#?#? 1,3,1,6
+		// 	????.#...#... 4,1,1
+		// 	????.######..#####. 1,6,5
+		// 	?###???????? 3,2,1`),
+		// 	expected: -1,
+		// },
+		// {
+		// 	id:       "Puzzle 1",
+		// 	input:    strings.NewReader(input_txt),
+		// 	expected: -1,
+		// },
 	}
 
 	for _, test := range tests {

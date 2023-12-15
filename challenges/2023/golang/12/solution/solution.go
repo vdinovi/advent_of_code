@@ -27,7 +27,33 @@ func SolveP1(input Input) (Answer, error) {
 }
 
 func SolveP2(input Input) (Answer, error) {
-	return 0, nil
+	records, err := scan(input)
+	if err != nil {
+		return 0, err
+	}
+	repeat := 5
+	sum := 0
+	for _, r := range records {
+		unfolded := r
+
+		unfolded.springs = make([]spring, len(r.springs)*repeat+(repeat-1))
+		for start, i := 0, 0; i < repeat; i += 1 {
+			start += copy(unfolded.springs[start:], r.springs)
+			if i < repeat-1 {
+				unfolded.springs[start] = unknown
+				start += 1
+			}
+		}
+
+		unfolded.groups = make([]int, len(r.groups)*repeat)
+		for start, i := 0, 0; i < repeat; i += 1 {
+			start += copy(unfolded.groups[start:], r.groups)
+		}
+
+		sum += len(unfolded.arrangements())
+	}
+
+	return Answer(sum), nil
 }
 
 type spring rune
@@ -71,6 +97,9 @@ func (rec *record) enumerate(results *[][]spring, pre, post []spring, groups []i
 		rec.enumerate(results, pre, post, groups[1:])
 		return
 	}
+	if rec.prune(pre, post, groups) {
+		return
+	}
 	switch post[0] {
 	case unknown:
 		rec.enumerate(results, append(pre, operational), post[1:], slices.Clone(groups))
@@ -80,6 +109,12 @@ func (rec *record) enumerate(results *[][]spring, pre, post []spring, groups []i
 	case damaged:
 		rec.enumerate(results, append(pre, damaged), post[1:], append([]int{groups[0] - 1}, groups[1:]...))
 	}
+}
+
+func (r *record) prune(pre, post []spring, groups []int) bool {
+	// TODO: implement pruning criteria. We should be able to tell based on the
+	//       remaining springs and groups whether or not we can get a possible answer
+	return false
 }
 
 func (r *record) valid(springs []spring) bool {
