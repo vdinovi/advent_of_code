@@ -1,5 +1,3 @@
-import sys
-
 type input = list[str]
 
 
@@ -9,20 +7,27 @@ def solve_p1(lines: input) -> int:
     for pattern in patterns:
         if len(pattern) < 2:
             continue
-        for pivot in vertical_reflections(pattern):
+        if (pivot := vertical_reflection(pattern, 0)) is not None:
             sum += pivot + 1
-            break
-        for pivot in horizontal_reflections(pattern):
+        elif (pivot := horizontal_reflection(pattern, 0)) is not None:
             sum += 100 * (pivot + 1)
-            break
     return sum
 
 
 def solve_p2(lines: input) -> int:
-    return 0
+    patterns = parse(lines)
+    sum = 0
+    for pattern in patterns:
+        if len(pattern) < 2:
+            continue
+        if (pivot := vertical_reflection(pattern, 1)) is not None:
+            sum += pivot + 1
+        elif (pivot := horizontal_reflection(pattern, 1)) is not None:
+            sum += 100 * (pivot + 1)
+    return sum
 
 
-def parse(lines: str) -> list[list[str]]:
+def parse(lines: list[str]) -> list[list[str]]:
     patterns = [[]]
     for line in lines:
         if not line:
@@ -32,38 +37,31 @@ def parse(lines: str) -> list[list[str]]:
     return patterns
 
 
-def vertical_reflections(pattern: list[str]) -> list[int]:
-    cols = len(pattern[0])
-    pivots = []
-    for pivot in range(0, cols - 1):
-        m = min(pivot, (cols - 1) - (pivot + 1))
-        reflection = True
-        for i in range(0, m + 1):
-            for line in pattern:
-                if line[pivot - i] != line[pivot + i + 1]:
-                    reflection = False
-                    break
-            if not reflection:
-                break
-        if reflection:
-            pivots.append(pivot)
-    return pivots
-
-
-def horizontal_reflections(pattern: list[str]) -> list[int]:
+def vertical_reflection(pattern: list[str], smudges: int) -> int | None:
     cols = len(pattern[0])
     rows = len(pattern)
-    pivots = []
+    for pivot in range(0, cols - 1):
+        diff = 0
+        width = min(pivot, (cols - 1) - (pivot + 1))
+        for i in range(0, width + 1):
+            for row in range(0, rows):
+                if pattern[row][pivot - i] != pattern[row][pivot + i + 1]:
+                    diff += 1
+        if diff == smudges:
+            return pivot
+    return None
+
+
+def horizontal_reflection(pattern: list[str], smudges: int) -> int | None:
+    cols = len(pattern[0])
+    rows = len(pattern)
     for pivot in range(0, rows - 1):
-        m = min(pivot, (rows - 1) - (pivot + 1))
-        reflection = True
-        for i in range(0, m + 1):
+        diff = 0
+        width = min(pivot, (rows - 1) - (pivot + 1))
+        for i in range(0, width + 1):
             for col in range(0, cols):
                 if pattern[pivot - i][col] != pattern[pivot + i + 1][col]:
-                    reflection = False
-                    break
-            if not reflection:
-                break
-        if reflection:
-            pivots.append(pivot)
-    return pivots
+                    diff += 1
+        if diff == smudges:
+            return pivot
+    return None

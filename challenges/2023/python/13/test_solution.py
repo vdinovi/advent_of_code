@@ -26,4 +26,19 @@ class TestSolution(unittest.TestCase):
                     self.assertEqual(answer, test["expected"])
 
     def test_solution_p2(self):
-        pass
+        tests = {
+            "sample 1": {
+                "file": "sample_1.txt",
+                "expected": 400,
+            },
+            "puzzle 1": {
+                "file": "puzzle.txt",
+                "expected": 40995,
+            },
+        }
+        for name, test in tests.items():
+            with self.subTest(test=name):
+                with open(inputs / test["file"]) as f:
+                    lines = [l.strip() for l in f.readlines()]
+                    answer = solve_p2(lines)
+                    self.assertEqual(answer, test["expected"])
