@@ -37,6 +37,7 @@ func (l Language) String() string {
 var (
 	Languages = [...]Language{
 		newLanguage("Golang", "golang", "golang"),
+		newLanguage("Python", "python", "python"),
 	}
 	LanguageNames []string
 )
