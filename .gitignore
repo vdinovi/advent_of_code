@@ -1,3 +1,5 @@
 .vscode
 bin/*
 !bin/render.sh
+*/**/__pycache__
+*/**/*.pyc
