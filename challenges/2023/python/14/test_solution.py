@@ -9,10 +9,14 @@ inputs = pathlib.Path(__file__).resolve().parent / "inputs"
 class TestSolution(unittest.TestCase):
     def test_solution_p1(self):
         tests = {
-            "sample 1": {
-                "file": "sample_1.txt",
+            "tilted": {
+                "file": "tilted.txt",
                 "expected": -1,
             },
+            # "sample 1": {
+            #     "file": "sample_1.txt",
+            #     "expected": -1,
+            # },
             # "puzzle 1": {
             #     "file": "puzzle.txt",
             #     "expected": -1,
