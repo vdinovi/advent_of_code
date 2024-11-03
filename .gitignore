@@ -1,8 +1,8 @@
 bin/*
-!bin/render.sh
-*/**/__pycache__
-*/**/*.pyc
-*/**/*.egg-info
 .venv/
 .mypy_cache/
 build/
+target/
+*/**/__pycache__
+*/**/*.pyc
+*/**/*.egg-info
